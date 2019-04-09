@@ -90,7 +90,7 @@ function renderStatistics() {
   for(let i = 0; i < imageLength; i++){
     //This creats a list item element and gets the attributes and appends it to Underorder list
     let liEl = document.createElement('li');
-    //primnt "3 votes for the Banana Slicer" to underordered list
+    //print "3 votes for the Banana Slicer" to underordered list
     liEl.innerHTML = `${images[i].votes} votes for the ${images[i].name}`;
     statsUl.appendChild(liEl);
   }
