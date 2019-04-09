@@ -183,7 +183,7 @@ function handleSurveyClick(id, fileName) {
 // ++++++++++++++++++++++++++++++++++++++++++++
 
 function drawChart() {
-  var data = {
+  var dataVote = {
     labels: chartNames, // titles array we declared earlier
     datasets: [{
       label: 'Number of Votes',
@@ -196,7 +196,7 @@ function drawChart() {
   var ctx = document.getElementById('voting-chart').getContext('2d');
   imageChart = new Chart(ctx, {
     type: 'bar',
-    data: data,
+    data: dataVote,
     options: {
       responsive: false,
       animation: {
