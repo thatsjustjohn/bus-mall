@@ -2,7 +2,10 @@
 //get DOM elements
 var imageUl = document.getElementById('image-survey');
 var statsUl = document.getElementById('image-statistics');
-//create structure to hold images and data
+
+// ++++++++++++++++++++++++++++++++++++++++++++
+// DATA - Variable declarations
+// ++++++++++++++++++++++++++++++++++++++++++++
 var imageNames = ['bag.jpg', 'banana.jpg', 'bathroom.jpg', 'boots.jpg', 'breakfast.jpg', 'bubblegum.jpg', 'chair.jpg', 'cthulhu.jpg', 'dog-duck.jpg', 'dragon.jpg', 'pen.jpg', 'pet-sweep.jpg', 'scissors.jpg', 'shark.jpg', 'sweep.png', 'tauntaun.jpg', 'unicorn.jpg', 'usb.gif', 'water-can.jpg', 'wine-glass.jpg'];
 var imageListPrevious = []; //holds previous image ids(indexes)
 var imageListCurrent = []; //holds current image ids(indexes)
@@ -11,8 +14,15 @@ var numberOfImagesForSurvery = 3; //this could change
 var imageLength = 0; //length of the image array
 var numOfVotes = 0; //starting number of votes
 var maxVotes = 25; //max votes made this so it can be adjusted
+var imageChart; //image chart
+var chartDrawn = false; //chartDrawn value
+// Arrays to hold data for the chart
+var votes = [];
+var chartNames = [];
 
-//image object constructor
+// ++++++++++++++++++++++++++++++++++++++++++++
+// DATA - Constructor and instances
+// ++++++++++++++++++++++++++++++++++++++++++++
 function ImageConstructor(fileName) {
   this.filepath = `img/${fileName}`;
   this.name = fileName.split('.').slice(0, -1).join('.');
@@ -28,6 +38,10 @@ function ImageConstructor(fileName) {
   };
 }
 
+// ++++++++++++++++++++++++++++++++++++++++++++
+// FUNCTION DECLARATIONS
+// ++++++++++++++++++++++++++++++++++++++++++++
+
 //populate image list
 function populateImageList(imageNames){
   //clear array
@@ -38,6 +52,31 @@ function populateImageList(imageNames){
     images.push(new ImageConstructor(imageNames[i]));
   }
 }
+
+//Create title names for list
+function populateChartNames(){
+  //clear array
+  chartNames = [];
+  //populate array
+  imageLength = imageNames.length;
+  for(let i = 0; i < imageLength; i++){
+    chartNames[i] = (imageNames[i].split('.').slice(0, -1).join('.'));
+  }
+  console.log('', chartNames);
+}
+
+//Create votes array from votes per object
+function populateVotes(){
+  //clear array
+  votes = [];
+  //populate array
+  imageLength = imageNames.length;
+  for(let i = 0; i < imageLength; i++){
+    votes[i] = (images[i].votes);
+  }
+  console.log('votes', votes);
+}
+
 
 // display random image 0 - N being the list size (but not including N) we need to floor this.
 // since 19.9 is possible rounding or ceil is not an option since 20 is out of bounds.
@@ -82,8 +121,8 @@ function renderRandomImages(imageListCurrent){
   }
 }
 
-//This function renders the statistics for the survery that was just taken
-function renderStatistics() {
+//This function renders the statistics for the survery via list
+function renderListStatistics() {
   //get length of image list
   let imageLength = images.length;
   console.log(imageLength);
@@ -94,6 +133,26 @@ function renderStatistics() {
     liEl.innerHTML = `${images[i].votes} votes for the ${images[i].name}`;
     statsUl.appendChild(liEl);
   }
+}
+
+//This function renders the statistifs for the surery via chart
+function renderChartStatistics() {
+  //we only want to draw the chart once.
+  if(!chartDrawn){
+    //populate data for the chart.
+    populateChartNames();
+    populateVotes();
+    //data.datasets[0].data = votes;
+    //data.labels = chartNames;
+    drawChart();
+    console.log('chart was drawn');
+  }
+  // //get length of image list
+  // let imageLength = images.length;
+
+  // for(let i = 0; i < imageLength; i++){
+
+  // }
 }
 
 //This fucntion just clears all the images from the UL
@@ -117,6 +176,119 @@ function handleSurveyClick(id, fileName) {
   renderRandomImages(imageListCurrent);
 }
 
+// ++++++++++++++++++++++++++++++++++++++++++++
+// CHART STUFF
+// Charts rendered using Chart JS v.2.6.0
+// http://www.chartjs.org/
+// ++++++++++++++++++++++++++++++++++++++++++++
+
+function drawChart() {
+  var data = {
+    labels: chartNames, // titles array we declared earlier
+    datasets: [{
+      data: votes, // votes array we declared earlier
+      backgroundColor: [
+        'bisque',
+        'darkgray',
+        'burlywood',
+        'lightblue',
+        'navy',
+        'bisque',
+        'darkgray',
+        'burlywood',
+        'lightblue',
+        'navy',
+        'bisque',
+        'darkgray',
+        'burlywood',
+        'lightblue',
+        'navy',
+        'bisque',
+        'darkgray',
+        'burlywood',
+        'lightblue',
+        'navy',
+        'bisque',
+        'darkgray',
+        'burlywood',
+        'lightblue',
+        'navy'
+      ],
+      hoverBackgroundColor: [
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple',
+        'purple'
+      ]
+    }]
+  };
+
+  var ctx = document.getElementById('voting-chart').getContext('2d');
+  imageChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: false,
+      animation: {
+        duration: 100,
+        easing: 'easeOutBounce'
+      }
+    },
+    scales: {
+      yAxes: [{
+        ticks: {
+          max: 10,
+          min: 0,
+          stepSize: 1.0
+        }
+      }]
+    }
+  });
+  chartDrawn = true;
+}
+
+//function to hide the chart.
+function hideChart() {
+  document.getElementById('funky-chart').hidden = true;
+}
+
+// ++++++++++++++++++++++++++++++++++++++++++++
+// MAIN FUNCTION CALLS
+// ++++++++++++++++++++++++++++++++++++++++++++
+
+//populate images
+populateImageList(imageNames);
+
+//populate first random images
+getRandomImages(numberOfImagesForSurvery);
+
+//renders all the images for the current list
+renderRandomImages(imageListCurrent);
+
+// ++++++++++++++++++++++++++++++++++++++++++++
+// EVENT LISTENERS
+// ++++++++++++++++++++++++++++++++++++++++++++
 //This add an event listen to the UL.
 imageUl.addEventListener('click', function(e){
   console.log(e.target);
@@ -131,20 +303,12 @@ imageUl.addEventListener('click', function(e){
     }else{
       //handle max votes
       alert('You have reach the max number of votes!');
-      renderStatistics();
+      //renderListStatistics();
+      renderChartStatistics();
       console.log(images);
     }
   }
 });
 
-//FUNCTION CALLS TO DO THE MAIN STUFF
-//populate images
-populateImageList(imageNames);
-
-//populate first random images
-getRandomImages(numberOfImagesForSurvery);
-
-//renders all the images for the current list
-renderRandomImages(imageListCurrent);
 
 
