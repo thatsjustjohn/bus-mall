@@ -186,61 +186,10 @@ function drawChart() {
   var data = {
     labels: chartNames, // titles array we declared earlier
     datasets: [{
+      label: 'Number of Votes',
       data: votes, // votes array we declared earlier
-      backgroundColor: [
-        'bisque',
-        'darkgray',
-        'burlywood',
-        'lightblue',
-        'navy',
-        'bisque',
-        'darkgray',
-        'burlywood',
-        'lightblue',
-        'navy',
-        'bisque',
-        'darkgray',
-        'burlywood',
-        'lightblue',
-        'navy',
-        'bisque',
-        'darkgray',
-        'burlywood',
-        'lightblue',
-        'navy',
-        'bisque',
-        'darkgray',
-        'burlywood',
-        'lightblue',
-        'navy'
-      ],
-      hoverBackgroundColor: [
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple',
-        'purple'
-      ]
+      backgroundColor: '#1FE3B1',
+      hoverBackgroundColor: '#516AF6'
     }]
   };
 
