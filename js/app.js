@@ -74,7 +74,6 @@ function populateChartNames(){
   for(let i = 0; i < imageLength; i++){
     dataVote.labels[i] = (imageNames[i].split('.').slice(0, -1).join('.'));
   }
-  console.log('', dataVote.labels);
 }
 
 //Create votes array from votes per object
@@ -86,7 +85,6 @@ function populateVotes(){
   for(let i = 0; i < imageLength; i++){
     dataVote.datasets[0].data[i] = (images[i].votes);
   }
-  console.log('votes', dataVote.datasets[0].data);
 }
 
 //Create votes array from votes per object
@@ -98,7 +96,6 @@ function populateViews(){
   for(let i = 0; i < imageLength; i++){
     dataVote.datasets[1].data[i] = (images[i].views);
   }
-  console.log('votes', dataVote.datasets[1].data);
 }
 
 
@@ -114,7 +111,6 @@ function getRandomImages(maxImages){
   imageListCurrent = [];
   imageLength = images.length; //make sure this is up to date
   //loops until we get all the images
-  console.log('enter loop');
   while(imageListCurrent.length !== maxImages){
     //gets a random number
     let randomNumber = getRandomNumber(0, imageLength);
@@ -124,7 +120,6 @@ function getRandomImages(maxImages){
       imageListCurrent.push(randomNumber);
       //increment view count for image
       images[randomNumber].incrementViews();
-      console.log('image number', randomNumber);
     }else{
       console.log('duplicate', randomNumber);
     }
@@ -149,7 +144,6 @@ function renderRandomImages(imageListCurrent){
 function renderListStatistics() {
   //get length of image list
   let imageLength = images.length;
-  console.log(imageLength);
   for(let i = 0; i < imageLength; i++){
     //This creats a list item element and gets the attributes and appends it to Underorder list
     let liEl = document.createElement('li');
@@ -182,7 +176,6 @@ function clearRandomImages(){
 //This function handles the clicks in the UL and appropriately calls functions for a round
 function handleSurveyClick(id, fileName) {
   //id have O(1) lookup unless we store items in hashtable
-  console.log(id + ' ' + fileName);
   //call function to update stats
   images[id].incrementVotes();
   //get new random images
@@ -247,21 +240,18 @@ renderRandomImages(imageListCurrent);
 // ++++++++++++++++++++++++++++++++++++++++++++
 //This add an event listen to the UL.
 imageUl.addEventListener('click', function(e){
-  console.log(e.target);
   //makes sure you clicked on something good.
   if (e.target && e.target.alt) {
     //if statement to handle number of votes
     if(numOfVotes < maxVotes){
       //increment votes
       numOfVotes++;
-      console.log(numOfVotes);
       handleSurveyClick(e.target.id, e.target.alt);
     }else{
       //handle max votes
       alert('You have reach the max number of votes!');
       //renderListStatistics();
       renderChartStatistics();
-      console.log(images);
     }
   }
 });
