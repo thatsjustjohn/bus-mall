@@ -1,7 +1,7 @@
 'use strict';
 //get DOM elements
 var imageUl = document.getElementById('image-survey');
-var statsUl = document.getElementById('image-statistics');
+// var statsUl = document.getElementById('image-statistics');
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // DATA - Variable declarations
@@ -16,7 +16,6 @@ var numOfVotes = 0; //starting number of votes
 var maxVotes = 25; //max votes made this so it can be adjusted
 var imageChart; //image chart
 var chartDrawn = false; //chartDrawn value
-
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // DATA - Constructor and instances
@@ -140,18 +139,18 @@ function renderRandomImages(imageListCurrent){
   }
 }
 
-//This function renders the statistics for the survery via list
-function renderListStatistics() {
-  //get length of image list
-  let imageLength = images.length;
-  for(let i = 0; i < imageLength; i++){
-    //This creats a list item element and gets the attributes and appends it to Underorder list
-    let liEl = document.createElement('li');
-    //print "3 votes for the Banana Slicer" to underordered list
-    liEl.innerHTML = `${images[i].votes} votes for the ${images[i].name}`;
-    statsUl.appendChild(liEl);
-  }
-}
+// //This function renders the statistics for the survery via list
+// function renderListStatistics() {
+//   //get length of image list
+//   let imageLength = images.length;
+//   for(let i = 0; i < imageLength; i++){
+//     //This creats a list item element and gets the attributes and appends it to Underorder list
+//     let liEl = document.createElement('li');
+//     //print "3 votes for the Banana Slicer" to underordered list
+//     liEl.innerHTML = `${images[i].votes} votes for the ${images[i].name}`;
+//     statsUl.appendChild(liEl);
+//   }
+// }
 
 //This function renders the statistifs for the surery via chart
 function renderChartStatistics() {
@@ -174,8 +173,9 @@ function clearRandomImages(){
 }
 
 //This function handles the clicks in the UL and appropriately calls functions for a round
-function handleSurveyClick(id, fileName) {
+function handleSurveyClick(id) {
   //id have O(1) lookup unless we store items in hashtable
+  console.log(`Item Clicked: id=${id}`);
   //call function to update stats
   images[id].incrementVotes();
   //get new random images
@@ -217,10 +217,10 @@ function drawChart() {
   chartDrawn = true;
 }
 
-//function to hide the chart.
-function hideChart() {
-  document.getElementById('funky-chart').hidden = true;
-}
+// //function to hide the chart.
+// function hideChart() {
+//   document.getElementById('funky-chart').hidden = true;
+// }
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // MAIN FUNCTION CALLS
