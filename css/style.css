@@ -6,7 +6,7 @@ body {
 /* HEADER */
 header {
   background: #444;
-  height: 100px;
+  height: 80px;
 }
 
 header nav {
@@ -23,6 +23,11 @@ header nav ul li {
 }
 
 header nav ul li a {
+  text-decoration: none;
+  color: #1FE3B1;
+}
+
+header nav ul li a:hover {
   text-decoration: none;
   color: #516AF6;
 }
@@ -48,10 +53,16 @@ main aside h3 {
 }
 
 main section ul li {
-  border: black solid;
+  border: 5px solid black;
   padding: 0px;
   margin: 30px 75px 0px 0px;
   display: inline-block;
+
+}
+
+main section ul li:hover {
+  border: 5px solid #516AF6;
+
 }
 
 main aside {
@@ -76,5 +87,5 @@ main aside canvas {
 footer {
   clear: both;
   background: #444;
-  height: 100px;
+  height: 80px;
 }

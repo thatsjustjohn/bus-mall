@@ -43,6 +43,11 @@ var dataVote = {
     data: [], // votes array we declared earlier
     backgroundColor: '#1FE3B1',
     hoverBackgroundColor: '#516AF6'
+  },{
+    label: 'Number of Views',
+    data: [], // votes array we declared earlier
+    backgroundColor: '#38A7D4',
+    hoverBackgroundColor: '#516AF6'
   }]
 };
 // ++++++++++++++++++++++++++++++++++++++++++++
@@ -82,6 +87,18 @@ function populateVotes(){
     dataVote.datasets[0].data[i] = (images[i].votes);
   }
   console.log('votes', dataVote.datasets[0].data);
+}
+
+//Create votes array from votes per object
+function populateViews(){
+  //clear array
+  dataVote.datasets[1].data = [];
+  //populate array
+  imageLength = imageNames.length;
+  for(let i = 0; i < imageLength; i++){
+    dataVote.datasets[1].data[i] = (images[i].views);
+  }
+  console.log('votes', dataVote.datasets[1].data);
 }
 
 
@@ -149,6 +166,7 @@ function renderChartStatistics() {
     //populate data for the chart.
     populateChartNames();
     populateVotes();
+    populateViews();
     drawChart();
     console.log('chart was drawn');
   }
