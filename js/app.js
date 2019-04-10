@@ -16,9 +16,7 @@ var numOfVotes = 0; //starting number of votes
 var maxVotes = 25; //max votes made this so it can be adjusted
 var imageChart; //image chart
 var chartDrawn = false; //chartDrawn value
-// Arrays to hold data for the chart
-var votes = [];
-var chartNames = [];
+
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // DATA - Constructor and instances
@@ -38,6 +36,20 @@ function ImageConstructor(fileName) {
   };
 }
 
+var dataVote = {
+  labels: [], // titles array we declared earlier
+  datasets: [{
+    label: 'Number of Votes',
+    data: [], // votes array we declared earlier
+    backgroundColor: '#1FE3B1',
+    hoverBackgroundColor: '#516AF6'
+  },{
+    label: 'Number of Views',
+    data: [], // votes array we declared earlier
+    backgroundColor: '#38A7D4',
+    hoverBackgroundColor: '#516AF6'
+  }]
+};
 // ++++++++++++++++++++++++++++++++++++++++++++
 // FUNCTION DECLARATIONS
 // ++++++++++++++++++++++++++++++++++++++++++++
@@ -56,25 +68,37 @@ function populateImageList(imageNames){
 //Create title names for list
 function populateChartNames(){
   //clear array
-  chartNames = [];
+  dataVote.labels = [];
   //populate array
   imageLength = imageNames.length;
   for(let i = 0; i < imageLength; i++){
-    chartNames[i] = (imageNames[i].split('.').slice(0, -1).join('.'));
+    dataVote.labels[i] = (imageNames[i].split('.').slice(0, -1).join('.'));
   }
-  console.log('', chartNames);
+  console.log('', dataVote.labels);
 }
 
 //Create votes array from votes per object
 function populateVotes(){
   //clear array
-  votes = [];
+  dataVote.datasets[0].data = [];
   //populate array
   imageLength = imageNames.length;
   for(let i = 0; i < imageLength; i++){
-    votes[i] = (images[i].votes);
+    dataVote.datasets[0].data[i] = (images[i].votes);
   }
-  console.log('votes', votes);
+  console.log('votes', dataVote.datasets[0].data);
+}
+
+//Create votes array from votes per object
+function populateViews(){
+  //clear array
+  dataVote.datasets[1].data = [];
+  //populate array
+  imageLength = imageNames.length;
+  for(let i = 0; i < imageLength; i++){
+    dataVote.datasets[1].data[i] = (images[i].views);
+  }
+  console.log('votes', dataVote.datasets[1].data);
 }
 
 
@@ -142,17 +166,10 @@ function renderChartStatistics() {
     //populate data for the chart.
     populateChartNames();
     populateVotes();
-    //data.datasets[0].data = votes;
-    //data.labels = chartNames;
+    populateViews();
     drawChart();
     console.log('chart was drawn');
   }
-  // //get length of image list
-  // let imageLength = images.length;
-
-  // for(let i = 0; i < imageLength; i++){
-
-  // }
 }
 
 //This fucntion just clears all the images from the UL
@@ -183,16 +200,6 @@ function handleSurveyClick(id, fileName) {
 // ++++++++++++++++++++++++++++++++++++++++++++
 
 function drawChart() {
-  var dataVote = {
-    labels: chartNames, // titles array we declared earlier
-    datasets: [{
-      label: 'Number of Votes',
-      data: votes, // votes array we declared earlier
-      backgroundColor: '#1FE3B1',
-      hoverBackgroundColor: '#516AF6'
-    }]
-  };
-
   var ctx = document.getElementById('voting-chart').getContext('2d');
   imageChart = new Chart(ctx, {
     type: 'bar',
