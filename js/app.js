@@ -1,7 +1,7 @@
 'use strict';
 //get DOM elements
 var imageUl = document.getElementById('image-survey');
-// var statsUl = document.getElementById('image-statistics');
+var footerUl = document.getElementById('canvas-controls');
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // DATA - Variable declarations
@@ -16,15 +16,17 @@ var numOfVotes = 0; //starting number of votes
 var maxVotes = 25; //max votes made this so it can be adjusted
 var imageChart; //image chart
 var chartDrawn = false; //chartDrawn value
+var imagesSaved = false;
+var dataLoaded = false;
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // DATA - Constructor and instances
 // ++++++++++++++++++++++++++++++++++++++++++++
-function ImageConstructor(fileName) {
-  this.filepath = `img/${fileName}`;
+function ImageConstructor(fileName, votes, views) {
+  this.filePath = `img/${fileName}`;
   this.name = fileName.split('.').slice(0, -1).join('.');
-  this.votes = 0;
-  this.views = 0;
+  this.votes = votes;
+  this.views = views;
   //increments votes
   this.incrementVotes = function(){
     this.votes++;
@@ -53,6 +55,64 @@ var dataVote = {
 // FUNCTION DECLARATIONS
 // ++++++++++++++++++++++++++++++++++++++++++++
 
+//Checks for loaded data this will help clean up code and avoid unnecessary reloads
+function loadData(){
+  if(!dataLoaded){
+    if(localStorage){ //if local storage
+      if(localStorage.length === 0){ //if local storage is empty
+        //create objects from array
+        //populate images
+        populateImageList(imageNames);
+      }else{
+        //read from local storage
+        retrieveImageClasses();
+      }
+    }
+    dataLoaded = true;
+  }
+}
+
+//saves all the image class objects to local storage
+function saveImageClasses(){
+  //saves all images data to local storage
+  //if local storage exists and they images haven't been saved
+  if(localStorage && !imagesSaved) {
+    localStorage.setItem('images', JSON.stringify(images));
+    imagesSaved = true;
+  }else if(imagesSaved){
+    console.log('Image Data: already saved');
+  }else{
+    alert('There was a problem saving to local storage');
+  }
+}
+
+function retrieveImageClasses(){
+  let imageObjects = readLocalStorage();
+  if(imageObjects){
+    //we have retrieved objects
+    //clear images
+    images = [];
+    let imageLength = imageObjects.length;
+    for(let i = 0; i < imageLength; i++){
+      //create image classes
+      //Note the split and pop to avoid cotinually adding the file extention.
+      images.push(new ImageConstructor(imageObjects[i].filePath.split('/').pop(), imageObjects[i].votes, imageObjects[i].views));
+    }
+  }else{
+    //if we didn't retrieve anything (or failed too)
+    images = [];
+    //create objects with 0 votes and 0 views the default way
+    populateImageList(imageNames);
+  }
+}
+
+//reads local storage and returns data to restrieve image classes
+function readLocalStorage(){
+  let retrievedJSONData = localStorage.getItem('images');
+  return JSON.parse(retrievedJSONData);
+}
+
+
 //populate image list
 function populateImageList(imageNames){
   //clear array
@@ -60,7 +120,8 @@ function populateImageList(imageNames){
   //populate array
   imageLength = imageNames.length;
   for(let i = 0; i < imageLength; i++){
-    images.push(new ImageConstructor(imageNames[i]));
+    //since this is the CREATION votes and views are 0
+    images.push(new ImageConstructor(imageNames[i], 0, 0));
   }
 }
 
@@ -96,7 +157,6 @@ function populateViews(){
     dataVote.datasets[1].data[i] = (images[i].views);
   }
 }
-
 
 // display random image 0 - N being the list size (but not including N) we need to floor this.
 // since 19.9 is possible rounding or ceil is not an option since 20 is out of bounds.
@@ -134,34 +194,25 @@ function renderRandomImages(imageListCurrent){
     //This creats a list item element and gets the attributes and appends it to Underorder list
     let liEl = document.createElement('li');
     //dynamically change pixel size based on how many images (FUTURE)
-    liEl.innerHTML = `<img id="${imageListCurrent[i]}" width="300px" height="300" src="${images[imageListCurrent[i]].filepath}" alt="${images[imageListCurrent[i]].name}" title="${images[imageListCurrent[i]].name}">`;
+    liEl.innerHTML = `<img id="${imageListCurrent[i]}" width="300px" height="300" src="${images[imageListCurrent[i]].filePath}" alt="${images[imageListCurrent[i]].name}" title="${images[imageListCurrent[i]].name}">`;
     imageUl.appendChild(liEl);
   }
 }
 
-// //This function renders the statistics for the survery via list
-// function renderListStatistics() {
-//   //get length of image list
-//   let imageLength = images.length;
-//   for(let i = 0; i < imageLength; i++){
-//     //This creats a list item element and gets the attributes and appends it to Underorder list
-//     let liEl = document.createElement('li');
-//     //print "3 votes for the Banana Slicer" to underordered list
-//     liEl.innerHTML = `${images[i].votes} votes for the ${images[i].name}`;
-//     statsUl.appendChild(liEl);
-//   }
-// }
-
 //This function renders the statistifs for the surery via chart
 function renderChartStatistics() {
   //we only want to draw the chart once.
+  //populate data for the chart.
+  populateChartNames();
+  populateVotes();
+  populateViews();
   if(!chartDrawn){
-    //populate data for the chart.
-    populateChartNames();
-    populateVotes();
-    populateViews();
     drawChart();
+    showChart();
     console.log('chart was drawn');
+  }else{
+    imageChart.update();
+    showChart();
   }
 }
 
@@ -174,16 +225,24 @@ function clearRandomImages(){
 
 //This function handles the clicks in the UL and appropriately calls functions for a round
 function handleSurveyClick(id) {
-  //id have O(1) lookup unless we store items in hashtable
-  console.log(`Item Clicked: id=${id}`);
+  //ids have O(1) lookup unless we store items in hashtable
   //call function to update stats
   images[id].incrementVotes();
-  //get new random images
-  getRandomImages(numberOfImagesForSurvery);
-  //clear previous
-  clearRandomImages();
-  //render new
-  renderRandomImages(imageListCurrent);
+  if(numOfVotes < 25){
+    //get new random images
+    getRandomImages(numberOfImagesForSurvery);
+    //clear previous
+    clearRandomImages();
+    //render new
+    renderRandomImages(imageListCurrent);
+  }else{
+    alert('You have reach the max number of votes!');
+    //SAVE DATA ON FINISHED FOR VOTING
+    //CLEAR data and maybe show top 3 for view / vote
+    saveImageClasses();
+    //renderListStatistics();
+    renderChartStatistics();
+  }
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++
@@ -192,6 +251,7 @@ function handleSurveyClick(id) {
 // http://www.chartjs.org/
 // ++++++++++++++++++++++++++++++++++++++++++++
 
+//function to draw the chart
 function drawChart() {
   var ctx = document.getElementById('voting-chart').getContext('2d');
   imageChart = new Chart(ctx, {
@@ -217,27 +277,36 @@ function drawChart() {
   chartDrawn = true;
 }
 
-// //function to hide the chart.
-// function hideChart() {
-//   document.getElementById('funky-chart').hidden = true;
-// }
+//function to show chart
+function showChart() {
+  document.getElementById('voting-chart').style.visibility = 'visible';
+  document.getElementById('voting-chart').style.display = 'block';
+}
+
+//function to hide the chart.
+function hideChart() {
+  document.getElementById('voting-chart').style.visibility = 'hidden';
+  document.getElementById('voting-chart').style.display = 'none';
+}
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // MAIN FUNCTION CALLS
 // ++++++++++++++++++++++++++++++++++++++++++++
 
-//populate images
-populateImageList(imageNames);
+function main(){
+  //loads data from local storage or creates a new structures or does nothing
+  loadData();
 
-//populate first random images
-getRandomImages(numberOfImagesForSurvery);
+  //clear random images incase any exist
+  clearRandomImages();
 
-//renders all the images for the current list
-renderRandomImages(imageListCurrent);
+  //populate first random images
+  getRandomImages(numberOfImagesForSurvery);
 
-// ++++++++++++++++++++++++++++++++++++++++++++
-// EVENT LISTENERS
-// ++++++++++++++++++++++++++++++++++++++++++++
+  //renders all the images for the current list
+  renderRandomImages(imageListCurrent);
+}
+
 //This add an event listen to the UL.
 imageUl.addEventListener('click', function(e){
   //makes sure you clicked on something good.
@@ -250,11 +319,42 @@ imageUl.addEventListener('click', function(e){
     }else{
       //handle max votes
       alert('You have reach the max number of votes!');
-      //renderListStatistics();
+      //SAVE DATA ON FINISHED FOR VOTING
+      saveImageClasses();
       renderChartStatistics();
     }
   }
 });
 
+//This add an event listen to the UL.
+footerUl.addEventListener('click', function(e){
+  //makes sure you clicked on something good
+  if (e.target) {
+    if(e.target.innerText === 'Reset Stats'){
+      if(localStorage){
+        //clear local storage and image variables
+        localStorage.clear();
+      }
+      //clear image objects
+      images = [];
+      //since we are clearing all the data we need to remake images
+      //could maybe do a function to just make votes and views [] as well.
+      dataLoaded = false;
+      //reset chart and hide chart
+      hideChart();
+      //set votes to 0
+      numOfVotes = 0;
+      main();
+    }else if(e.target.innerText === 'Retake Survey'){
+      //reset chart and hide chart
+      hideChart();
+      numOfVotes = 0;
+      main();
+    }
+  }
+});
 
-
+// ++++++++++++++++++++++++++++++++++++++++++++
+// MAIN
+// ++++++++++++++++++++++++++++++++++++++++++++
+main();
