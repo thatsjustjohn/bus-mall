@@ -82,10 +82,31 @@ main aside ul li {
 main aside canvas {
   margin-left: auto;
   margin-right: auto;
+  display: none;
+  visibility: hidden;
 }
 /* FOOTER */
 footer {
   clear: both;
   background: #444;
   height: 80px;
+}
+
+footer ul {
+  text-align: center;
+}
+footer ul li {
+  display: inline-block;
+  margin: 30px 75px 0px 0px;
+}
+
+footer ul li {
+  text-decoration: none;
+  color: #1FE3B1;
+}
+
+footer ul li:hover {
+  text-decoration: none;
+  cursor: pointer;
+  color: #516AF6;
 }
